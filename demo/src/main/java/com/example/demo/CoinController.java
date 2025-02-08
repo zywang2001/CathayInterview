@@ -4,10 +4,11 @@ import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,8 +30,8 @@ public class CoinController {
     private RestTemplate restTemplate;
 
     @PostMapping("/insert")
-    public CoinType insert(@RequestBody CoinType coin){
-        return coinService.insert(coin);
+    public int insert(@RequestBody CoinType coin){
+        return coinService.insert(coin).getId();
     }
 
     @PostMapping("/insert_multi")
@@ -44,7 +45,7 @@ public class CoinController {
     }
 
     @GetMapping("/selectById/{id}")
-    public Optional<CoinType> selectById(@PathVariable int id){
+    public CoinType selectById(@PathVariable int id){
         return coinService.selectById(id);
     }
 
@@ -60,16 +61,16 @@ public class CoinController {
         coinService.delete(id);
     }
     
-    @GetMapping("/getCoindeskData")
-    public String getCoindeskData() throws IOException {
+    @GetMapping("/callCoindesk")
+    public String callCoindesk() throws IOException {
         String url = "https://api.coindesk.com/v1/bpi/currentprice.json";
         String response = restTemplate.getForObject(url, String.class);
         return response;
     }
 
     @GetMapping("/convertCoindesk")
-    public  Map<String, Object> convertCoindesk() throws IOException {       
-        String resData = getCoindeskData();
+    public String convertCoindesk() throws IOException, JSONException {       
+        String resData = callCoindesk();
         JSONObject jsonObject = new JSONObject(resData); 
 
         String responds_time = jsonObject.getJSONObject("time").getString("updatedISO");
@@ -85,7 +86,9 @@ public class CoinController {
         // -        
         JSONArray resultArr = new JSONArray();
         JSONObject bpiObject = jsonObject.getJSONObject("bpi");
-        for (String coinCode : bpiObject.keySet()) {
+        Iterator<String> keys = bpiObject.keys();
+        while (keys.hasNext()) {
+            String coinCode = keys.next();
             JSONObject coin = bpiObject.getJSONObject(coinCode);
             String rate = coin.getString("rate");
             String desc = coin.getString("description");
@@ -95,10 +98,10 @@ public class CoinController {
         }
 
         JSONObject res = new JSONObject();
-        res.put("respondsTime", formattedRespondsTime);
+        res.put("respondedTime", formattedRespondsTime);
         res.put("NowTime", formattedNowTime);
         res.put("resultOfBpiInfo", resultArr);
-        return res.toMap();
+        return res.toString();
     }
 
 }

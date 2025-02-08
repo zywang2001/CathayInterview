@@ -1,8 +1,6 @@
 package com.example.demo;
 
 import java.util.List;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +14,8 @@ public class CoinService {
         return coinRepository.findAll();
     }
 
-    public Optional<CoinType> selectById(int id) {
-        return coinRepository.findById(id);
+    public CoinType selectById(int id) {
+        return coinRepository.findById(id).orElse(null);
     }
 
     public CoinType insert(CoinType c) {

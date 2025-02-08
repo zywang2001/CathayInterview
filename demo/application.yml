@@ -14,3 +14,8 @@ spring:
     open-in-view: false
     hibernate:
       ddl-auto: update  # 當 spring boot entity 有修改時, 會自動修改 DB scheam
+logging:
+  level:
+    org:
+      example: 
+        CoindeskApiTests: info

@@ -15,17 +15,17 @@ import lombok.Setter;
 @Setter
 public class CoinType {
 
-  @Id
-  @GeneratedValue(strategy=GenerationType.AUTO)
-  private int id;
+    @Id
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    private int id;
 
-  private String code;
+    private String code;
 
-  private String symbol;
+    private String symbol;
 
-  private String rate ;
+    private String rate;
 
-  private String description;
+    private String description;
 
-  private float rate_float;
+    private float rate_float;
 }
